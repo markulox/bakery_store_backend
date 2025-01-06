@@ -1,5 +1,5 @@
 use actix_web::web;
-use auth::{login, register};
+use auth::{login, logout, register};
 use bakery::{create_bakery, list_bakery};
 
 pub mod health_check;
@@ -17,5 +17,6 @@ pub fn get_route_config(cfg: &mut web::ServiceConfig) {
         web::scope("/api/auth")
             .route("/register", web::post().to(register))
             .route("/login", web::post().to(login))
+            .route("/logout", web::get().to(logout))
     );
 }

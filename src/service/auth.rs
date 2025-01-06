@@ -3,16 +3,13 @@ use chrono::Utc;
 use validator::Validate;
 
 use crate::{
-    model::{
+    middleware::jwt_auth, model::{
         self,
         users::{LoginUserSchema, RegisterUserSchema},
-    },
-    repository::auth::AuthRepository,
-    response::{
+    }, repository::auth::AuthRepository, response::{
         auth::{FilteredUser, LoginSuccessResponse, RegistrationSuccessResponse},
         APIResponse, Error,
-    },
-    BakeryAppState,
+    }, BakeryAppState
 };
 
 fn filter_user_record(user: &model::users::Model) -> FilteredUser {
@@ -103,4 +100,14 @@ pub async fn login(
             None,
         ),
     }
+}
+
+pub async fn logout(_: jwt_auth::JwtMiddleware) -> impl Responder {
+    APIResponse::new(true, 2000, "Logout complete", None, None::<()>).with_cookie(
+        Cookie::build("token", "")
+            .path("/")
+            .max_age(actix_web::cookie::time::Duration::new(-1, 0))
+            .http_only(true)
+            .finish()
+    )
 }
